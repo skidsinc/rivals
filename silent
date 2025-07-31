@@ -80,7 +80,7 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
     send_msg(randommsg)
   end
 
-  if input.KeyCode == getgenv().dps_settings["toggle_headshots_only"] then
+  if input.KeyCode == getgenv().dps_settings["toggle_headshot_only"] then
     headshot_only = not headshot_only
     notify("dps thugness", "toggled headshot only: "..tostring(headshot_only))
   end
