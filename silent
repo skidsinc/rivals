@@ -1,3 +1,9 @@
+--Hello! if your here it means you used some sort of HTTP spy (im guessing)
+--the obfuscation was not supposed to hide the source in anyway, it was just here because i didnt want my friends to see it
+--silent aim hook was not origionally made by me
+
+
+
 if getgenv().dps_settings == nil then
   getgenv().dps_settings = {
     ["toggle_silent"] = Enum.KeyCode.V,
@@ -8,6 +14,8 @@ if getgenv().dps_settings == nil then
     ["esp_colour"] = Color3.fromRGB(255, 0, 0),
     ["esp_outline_colour"] = Color3.fromRGB(255, 255, 255),
     ["normal_headshot_chance"] = 3, -- eg 3 means 1 in 3 chance
+    
+    ["randomization_strength"] = 50, -- 0-100 only - less random = more blatant
   }
 end
 
@@ -191,6 +199,7 @@ local get_closest_player = function()
 end
 
 getgenv().aimpart = "HumanoidRootPart"
+local random_strength = getgenv().dps_settings["randomization_strength"]
 
 local old = utility.Raycast
 utility.Raycast = function(...)
@@ -203,7 +212,7 @@ utility.Raycast = function(...)
       if holdingt == true or grens == true then
         -- do nothing
       else 
-        arguments[3] = closest[getgenv().aimpart].Position + Vector3.new(math.random(-7, 7) / 10, math.random(-1, 1) / 10, math.random(-7, 7) / 10)
+        arguments[3] = closest[getgenv().aimpart].Position + Vector3.new(math.random(-random_strength, random_strength) / 100, math.random(-5, 5) / 100, math.random(-random_strength, random_strength) / 100)
       end
     end
   end
