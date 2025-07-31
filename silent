@@ -105,20 +105,20 @@ local function esp_tt()
   task.spawn(function()
     for _, player in getgenv().current_players do
       task.spawn(function()
-        if not player:FindFirstChild("Head"):FindFirstChild("dpsthug") and esp_toggle == true then
-          addhighlight(player:FindFirstChild("Head"))
-        end
-
-        if player:FindFirstChild("Head"):FindFirstChild("dpsthug") and esp_toggle == false then
-          player:FindFirstChild("Head"):FindFirstChild("dpsthug"):Destroy()
-        end
-
         if not player:FindFirstChild("dpsthug") and esp_toggle == true then
           addhighlight(player)
         end
 
         if player:FindFirstChild("dpsthug") and esp_toggle == false then
           player:FindFirstChild("dpsthug"):Destroy()
+        end
+
+        if not player:FindFirstChild("Head"):FindFirstChild("dpsthug") and esp_toggle == true then
+          addhighlight(player:FindFirstChild("Head"))
+        end
+
+        if player:FindFirstChild("Head"):FindFirstChild("dpsthug") and esp_toggle == false then
+          player:FindFirstChild("Head"):FindFirstChild("dpsthug"):Destroy()
         end
       end)
     end
