@@ -1,1 +1,223 @@
+if getgenv().dps_settings == nil then
+  getgenv().dps_settings = {
+    ["toggle_silent"] = Enum.KeyCode.V,
+    ["toggle_headshot_only"] = Enum.KeyCode.O,
+    ["toggle_esp"] = Enum.KeyCode.P,
+    ["trash_talk"] = Enum.KeyCode.T,
 
+    ["esp_colour"] = Color3.fromRGB(255, 0, 0),
+    ["esp_outline_colour"] = Color3.fromRGB(255, 255, 255),
+    ["normal_headshot_chance"] = 3, -- eg 3 means 1 in 3 chance
+  }
+end
+
+
+local NotificationHolder = loadstring(game:HttpGet("https://raw.githubusercontent.com/BocusLuke/UI/main/STX/Module.Lua"))()
+local Notification = loadstring(game:HttpGet("https://raw.githubusercontent.com/BocusLuke/UI/main/STX/Client.Lua"))()
+
+local replicated_storage = game.GetService(game, "ReplicatedStorage")
+local players = game.GetService(game, "Players")
+
+local camera = workspace.CurrentCamera
+local utility = require(replicated_storage.Modules.Utility)
+
+local UserInputService = game:GetService("UserInputService")
+local holdingt = false
+local grens = false
+local esp_toggle = true
+local headshot_only = false
+local togglwoggle = true
+local trash_talk = {"quit the game", "5-0", "my nam has better aim", "your buns", "your my son", "doggie", "trash", "go aim train kid", "all this play time for what", "cry more", "wa wa wa wa", "yawn", "your just a skill issue"}
+
+local function send_msg(msg)
+  game:GetService("TextChatService").TextChannels.RBXGeneral:SendAsync(msg)
+end
+
+local function notify(head, desc, time, type)
+  local time_ = time or 10
+  local type_ = type or "default"
+  task.spawn(function()
+    Notification:Notify(
+      {Title = head, Description = desc},
+      {OutlineColor = Color3.fromRGB(80, 80, 80), Time = time_, Type = type_}
+    )
+  end)
+end
+
+local function addhighlight(part)
+  local highlight = Instance.new("Highlight")
+  highlight.Adornee = part
+  highlight.FillColor = getgenv().dps_settings["esp_colour"]
+  highlight.OutlineColor = getgenv().dps_settings["esp_outline_colour"]
+  highlight.FillTransparency = 0.4
+  highlight.OutlineTransparency = 0.2
+  highlight.Name = "dpsthug"
+  highlight.Parent = part
+end
+
+notify("dps thugness", "attempting to load...", 5)
+
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+  if gameProcessed then return end
+  if input.KeyCode == Enum.KeyCode.LeftControl or input.KeyCode == Enum.KeyCode.RightControl then
+    holdingt = true
+  end
+  if input.KeyCode == Enum.KeyCode.Four then
+    grens = true
+    notify("dps thugness", "grenade detected", 1)
+  elseif input.KeyCode == Enum.KeyCode.One or input.KeyCode == Enum.KeyCode.Two or input.KeyCode == Enum.KeyCode.Three then
+    grens = false
+  end
+
+  if input.KeyCode == getgenv().dps_settings["toggle_esp"] then
+    esp_toggle = not esp_toggle
+    notify("dps thugness", "toggled the esp: "..tostring(esp_toggle))
+    esp_tt()
+  end
+
+  if input.KeyCode == getgenv().dps_settings["trash_talk"] then
+    local randommsg = trash_talk[math.random(1, #trash_talk)]
+    send_msg(randommsg)
+  end
+
+  if input.KeyCode == getgenv().dps_settings["toggle_headshots_only"] then
+    headshot_only = not headshot_only
+    notify("dps thugness", "toggled headshot only: "..tostring(headshot_only))
+  end
+
+  if input.KeyCode == getgenv().dps_settings["toggle_silent"] then
+    togglwoggle = not togglwoggle
+    notify("dps thugness", "toggled silent aim: "..tostring(togglwoggle))
+  end
+end)
+
+UserInputService.InputEnded:Connect(function(input, gameProcessed)
+  if input.KeyCode == Enum.KeyCode.LeftControl or input.KeyCode == Enum.KeyCode.RightControl then
+    holdingt = false
+  end
+end)
+
+task.wait(math.random(1, 3))
+
+getgenv().current_players = {}
+
+local function esp_tt()
+  task.spawn(function()
+    for _, player in getgenv().current_players do
+      task.spawn(function()
+        if not player:FindFirstChild("Head"):FindFirstChild("dpsthug") and esp_toggle == true then
+          addhighlight(player:FindFirstChild("Head"))
+        end
+
+        if player:FindFirstChild("Head"):FindFirstChild("dpsthug") and esp_toggle == false then
+          player:FindFirstChild("Head"):FindFirstChild("dpsthug"):Destroy()
+        end
+
+        if not player:FindFirstChild("dpsthug") and esp_toggle == true then
+          addhighlight(player)
+        end
+
+        if player:FindFirstChild("dpsthug") and esp_toggle == false then
+          player:FindFirstChild("dpsthug"):Destroy()
+        end
+      end)
+    end
+  end)
+end
+
+task.spawn(function()
+  while task.wait(0.1) do
+    esp_tt()
+  end
+end)
+
+task.spawn(function()
+  while task.wait() do
+    task.spawn(function()
+      _G.entities = {}
+      for _, child in workspace.GetChildren(workspace) do
+        task.spawn(function()
+          if child.FindFirstChildOfClass(child, "Humanoid") then
+            table.insert(_G.entities, child)
+          elseif child.Name == "HurtEffect" then
+            for _, hurt_player in child.GetChildren(child) do
+              if (hurt_player.ClassName ~= "Highlight") then
+                table.insert(_G.entities, hurt_player)
+              end
+            end
+          end
+        end)
+      end
+      task.wait()
+      getgenv().current_players = _G.entities
+    end)
+  end
+end)
+
+local get_closest_player = function()
+  local closest, closest_distance = nil, math.huge
+  local character = players.LocalPlayer.Character
+
+  if (character == nil) then
+    return
+  end
+
+  for _, player in getgenv().current_players do
+    if (player == players.LocalPlayer) then
+      continue
+    end
+
+    if (not player:FindFirstChild("HumanoidRootPart")) or player:FindFirstChild("Head").Transparency > 0.1 or player:FindFirstChild("Humanoid").Health == 0 then
+      continue
+    end
+
+    local position, on_screen = camera.WorldToViewportPoint(camera, player.HumanoidRootPart.Position)
+
+    if (on_screen == false) then
+      continue
+    end
+
+    local center = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
+    local distance = (center - Vector2.new(position.X, position.Y)).Magnitude
+
+    if (distance > closest_distance) then
+      continue
+    end
+
+    closest = player
+    closest_distance = distance
+  end
+  return closest
+end
+
+getgenv().aimpart = "HumanoidRootPart"
+
+local old = utility.Raycast
+utility.Raycast = function(...)
+  local arguments = {...}
+
+  if (#arguments > 0 and arguments[4] == 999) and togglwoggle == true then
+    local closest = get_closest_player()
+
+    if (closest) then
+      if holdingt == true or grens == true then
+        -- do nothing
+      else 
+        arguments[3] = closest[getgenv().aimpart].Position + Vector3.new(math.random(-7, 7) / 10, math.random(-1, 1) / 10, math.random(-7, 7) / 10)
+      end
+    end
+  end
+  return old(table.unpack(arguments))
+end
+
+
+notify("dps thugness", "please only switch to grenades using number keys", 20, "option")
+notify("dps thugness", "use the keybinds you set in the script", 20, "option")
+
+while task.wait(0.1) do
+  if math.random(1, getgenv().dps_settings["normal_headshot_chance"]) == 1 or headshot_only == true then
+    getgenv().aimpart = "Head"
+  else
+    getgenv().aimpart = "HumanoidRootPart"
+  end
+end
