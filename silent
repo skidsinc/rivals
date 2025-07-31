@@ -1,6 +1,6 @@
 --Hello! if your here it means you used some sort of HTTP spy (im guessing)
---the obfuscation was not supposed to hide the source in anyway, it was just here because i didnt want my friends to see it
---silent aim hook was not origionally made by me
+--the obfuscation was not supposed to hide the source in anyway, it was just there to stop my friend changing the name on the notifications :pray:
+--silent aim was 'borrow' and get player function was 'borrowed' and modified
 
 
 
@@ -18,6 +18,8 @@ if getgenv().dps_settings == nil then
     ["randomization_strength"] = 50, -- 0-100 only - less random = more blatant
   }
 end
+
+getgenv().dps_loaded = false
 
 
 local NotificationHolder = loadstring(game:HttpGet("https://raw.githubusercontent.com/BocusLuke/UI/main/STX/Module.Lua"))()
@@ -64,6 +66,17 @@ local function addhighlight(part)
 end
 
 notify("dps thugness", "attempting to load...", 5)
+
+task.spawn(function()
+  task.wait(5)
+  if getgenv().dps_loaded == false then
+    notify("dps thugness", "taking longer to load then normal", 5)
+  end
+  task.wait(12)
+  if getgenv().dps_loaded == false then
+    notify("dps thugness", "script may be broken or lagging", 5)
+  end
+end)
 
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
   if gameProcessed then return end
@@ -225,6 +238,9 @@ end
 
 notify("dps thugness", "please only switch to grenades using number keys", 20, "option")
 notify("dps thugness", "use the keybinds you set in the script", 20, "option")
+
+
+getgenv().dps_loaded = true
 
 while task.wait(0.1) do
   if math.random(1, getgenv().dps_settings["normal_headshot_chance"]) == 1 or headshot_only == true then
