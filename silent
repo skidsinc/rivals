@@ -11,8 +11,6 @@ if getgenv().dps_settings == nil then
     ["toggle_esp"] = Enum.KeyCode.P,
     ["trash_talk"] = Enum.KeyCode.T,
 
-    ["esp_colour"] = Color3.fromRGB(255, 0, 0),
-    ["esp_outline_colour"] = Color3.fromRGB(255, 255, 255),
     ["normal_headshot_chance"] = 3, -- eg 3 means 1 in 3 chance
     
     ["randomization_strength"] = 50, -- 0-100 only - less random = more blatant
@@ -57,8 +55,8 @@ end
 local function addhighlight(part)
   local highlight = Instance.new("Highlight")
   highlight.Adornee = part
-  highlight.FillColor = getgenv().dps_settings["esp_colour"]
-  highlight.OutlineColor = getgenv().dps_settings["esp_outline_colour"]
+  highlight.FillColor = Color3.fromRGB(255, 255, 255)
+  highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
   highlight.FillTransparency = 0.4
   highlight.OutlineTransparency = 0.2
   highlight.Name = "dpsthug"
@@ -135,7 +133,7 @@ local function esp_tt()
           if esp_toggle == false then
             player:FindFirstChild("dpsthug"):Destroy()
           else
-
+            player:FindFirstChild("dpsthug").FillColor = Color3.fromHSV(getgenv().rgb_hue, 1, 1)
           end
         end
       end)
@@ -246,7 +244,7 @@ utility.Raycast = function(...)
       if holdingt == true or grens == true then
         -- do nothing
       else 
-        arguments[3] = closest[getgenv().aimpart].Position + Vector3.new(math.random(-random_strength, random_strength) / 100, math.random(-5, 5) / 100, math.random(-random_strength, random_strength) / 100)
+        arguments[3] = closest[getgenv().aimpart].Position + Vector3.new(math.random(-random_strength, random_strength) / 100, math.random(-11, 11) / 200, math.random(-random_strength, random_strength) / 100)
       end
     end
   end
@@ -267,4 +265,3 @@ while task.wait(0.1) do
     getgenv().aimpart = "HumanoidRootPart"
   end
 end
-
