@@ -14,6 +14,7 @@ if getgenv().dps_settings == nil then
     ["normal_headshot_chance"] = 4, -- eg 3 means 1 in 3 chance
     
     ["RGB_fists"] = true,
+    ["RGB_esp"] = true,
     
     ["randomization_strength"] = 50, -- 0-100 only - less random = more blatant
   }
@@ -57,7 +58,7 @@ end
 local function addhighlight(part)
   local highlight = Instance.new("Highlight")
   highlight.Adornee = part
-  highlight.FillColor = Color3.fromRGB(255, 255, 255)
+  highlight.FillColor = Color3.fromRGB(255, 0, 0)
   highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
   highlight.FillTransparency = 0.4
   highlight.OutlineTransparency = 0.2
@@ -134,7 +135,7 @@ local function esp_tt()
         if player:FindFirstChild("dpsthug") then
           if esp_toggle == false then
             player:FindFirstChild("dpsthug"):Destroy()
-          else
+          elseif getgenv().dps_settings["RGB_esp"] == true then
             player:FindFirstChild("dpsthug").FillColor = Color3.fromHSV(getgenv().rgb_hue, 1, 1)
           end
         end
