@@ -148,7 +148,7 @@ task.spawn(function()
 end)
 
 task.spawn(function()
-  while task.wait(0.25) do
+  while task.wait(0.5) do
     getgenv().rgb_hue = getgenv().rgb_hue + 0.05
     if getgenv().rgb_hue > 1 then
       getgenv().rgb_hue = 0
@@ -159,7 +159,7 @@ task.spawn(function()
         if v:IsA("BasePart") then
           task.spawn(function()
             v.Material = Enum.Material.ForceField
-            v.Transparency = 0.5
+            v.Transparency = 0.1
             v.Color =color
           end)
         end
