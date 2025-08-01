@@ -154,17 +154,19 @@ task.spawn(function()
       getgenv().rgb_hue = 0
     end
     local color = Color3.fromHSV(getgenv().rgb_hue, 1, 1)
-    task.spawn(function()
-      for i, v in pairs(game:GetService("Workspace").ViewModels.FirstPerson:GetDescendants()) do
-        if v:IsA("BasePart") then
-          task.spawn(function()
-            v.Material = Enum.Material.ForceField
-            v.Transparency = 0.1
-            v.Color =color
-          end)
+    if getgenv().dps_settings["RGB_fists"] == true then
+      task.spawn(function()
+        for i, v in pairs(game:GetService("Workspace").ViewModels.FirstPerson:GetDescendants()) do
+          if v:IsA("BasePart") then
+            task.spawn(function()
+              v.Material = Enum.Material.ForceField
+              v.Transparency = 0.1
+              v.Color =color
+            end)
+          end
         end
-      end
-    end)
+      end)
+    end
   end
 end)
 
