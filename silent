@@ -246,7 +246,7 @@ utility.Raycast = function(...)
     local closest = get_closest_player()
 
     if (closest) then
-      if holdingt == true or grens == true then
+      if holdingt == true or grens == true or (math.random(1,8) == 1 and headshot_only == false) then
         -- do nothing
       else 
         arguments[3] = closest[getgenv().aimpart].Position + Vector3.new(math.random(-random_strength, random_strength) / 100, math.random(-random_strength, random_strength) / 100, math.random(-random_strength, random_strength) / 100)
