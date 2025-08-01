@@ -249,7 +249,7 @@ utility.Raycast = function(...)
       if holdingt == true or grens == true then
         -- do nothing
       else 
-        arguments[3] = closest[getgenv().aimpart].Position + Vector3.new(math.random(-random_strength, random_strength) / 100, math.random(-5, 5) / 10, math.random(-random_strength, random_strength) / 100)
+        arguments[3] = closest[getgenv().aimpart].Position + Vector3.new(math.random(-random_strength, random_strength) / 100, math.random(-random_strength, random_strength) / 100, math.random(-random_strength, random_strength) / 100)
       end
     end
   end
