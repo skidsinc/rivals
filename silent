@@ -267,3 +267,4 @@ while task.wait(0.1) do
     getgenv().aimpart = "HumanoidRootPart"
   end
 end
+
