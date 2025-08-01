@@ -11,7 +11,9 @@ if getgenv().dps_settings == nil then
     ["toggle_esp"] = Enum.KeyCode.P,
     ["trash_talk"] = Enum.KeyCode.T,
 
-    ["normal_headshot_chance"] = 3, -- eg 3 means 1 in 3 chance
+    ["normal_headshot_chance"] = 4, -- eg 3 means 1 in 3 chance
+    
+    ["RGB_fists"] = true,
     
     ["randomization_strength"] = 50, -- 0-100 only - less random = more blatant
   }
