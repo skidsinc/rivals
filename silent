@@ -16,7 +16,7 @@ if getgenv().dps_settings == nil then
     ["RGB_fists"] = true,
     ["RGB_esp"] = true,
     
-    ["randomization_strength"] = 50, -- 0-100 only - less random = more blatant
+    ["randomization_strength"] = 45, -- 0-100 only - less random = more blatant
   }
 end
 
@@ -38,7 +38,7 @@ local grens = false
 local esp_toggle = true
 local headshot_only = false
 local togglwoggle = true
-local trash_talk = {"quit the game", "5-0", "my nam has better aim", "your buns", "your my son", "doggie", "trash", "go aim train kid", "all this play time for what", "cry more", "wa wa wa wa", "yawn", "your just a skill issue"}
+local trash_talk = {"quit the game", "get better", "lock in bro", "try harder next time", "my nan has better aim", "your buns", "your my son", "doggie", "trash", "go aim train kid", "cry more", "wa wa wa wa", "yawn", "your just a skill issue", "boo hoo", "get better"}
 
 local function send_msg(msg)
   game:GetService("TextChatService").TextChannels.RBXGeneral:SendAsync(msg)
@@ -163,8 +163,8 @@ task.spawn(function()
           if v:IsA("BasePart") then
             task.spawn(function()
               v.Material = Enum.Material.ForceField
-              v.Transparency = 0.1
-              v.Color =color
+              v.Transparency = 0.25
+              v.Color = color
             end)
           end
         end
