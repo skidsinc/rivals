@@ -1,6 +1,6 @@
 --Hello! if your here it means you used some sort of HTTP spy (im guessing)
 --the obfuscation was not supposed to hide the source in anyway, it was just there to stop my friend changing the name on the notifications :pray:
---silent aim was 'borrow' and get player function was 'borrowed' and modified
+--silent aim was 'borrowed' and the get player function was 'borrowed' and modified
 
 
 
@@ -11,12 +11,12 @@ if getgenv().dps_settings == nil then
     ["toggle_esp"] = Enum.KeyCode.P,
     ["trash_talk"] = Enum.KeyCode.T,
 
-    ["normal_headshot_chance"] = 4, -- eg 3 means 1 in 3 chance
+    ["normal_headshot_chance"] = 5, -- eg 3 means 1 in 3 chance
     
     ["RGB_fists"] = true,
     ["RGB_esp"] = true,
     
-    ["randomization_strength"] = 45, -- 0-100 only - less random = more blatant
+    ["randomization_strength"] = 54, -- 0-100 only - less random = more blatant
   }
 end
 
