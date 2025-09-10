@@ -1,6 +1,6 @@
 --Hello! if your here it means you used some sort of HTTP spy (im guessing)
 --the obfuscation was not supposed to hide the source in anyway, it was just there to stop my friend changing the name on the notifications :pray:
---silent aim was 'borrowed' and the get player function was 'borrowed' and modified
+--silent aim was 'borrow' and get player function was 'borrowed' and modified
 
 
 
@@ -10,13 +10,14 @@ if getgenv().dps_settings == nil then
     ["toggle_headshot_only"] = Enum.KeyCode.O,
     ["toggle_esp"] = Enum.KeyCode.P,
     ["trash_talk"] = Enum.KeyCode.T,
+    ["toggle_full_blatant"] = Enum.KeyCode.L,
 
-    ["normal_headshot_chance"] = 5, -- eg 3 means 1 in 3 chance
+    ["normal_headshot_chance"] = 4, -- eg 3 means 1 in 3 chance
     
-    ["RGB_fists"] = true,
-    ["RGB_esp"] = true,
+    ["RGB_fists"] = false,
+    ["RGB_esp"] = false,
     
-    ["randomization_strength"] = 54, -- 0-100 only - less random = more blatant
+    ["randomization_strength"] = 42, -- 0-100 only - less random = more blatant
   }
 end
 
@@ -38,6 +39,7 @@ local grens = false
 local esp_toggle = true
 local headshot_only = false
 local togglwoggle = true
+local full_blatant = false
 local trash_talk = {"quit the game", "get better", "lock in bro", "try harder next time", "my nan has better aim", "your buns", "your my son", "doggie", "trash", "go aim train kid", "cry more", "wa wa wa wa", "yawn", "your just a skill issue", "boo hoo", "get better"}
 
 local function send_msg(msg)
@@ -105,6 +107,11 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
   if input.KeyCode == getgenv().dps_settings["toggle_headshot_only"] then
     headshot_only = not headshot_only
     notify("dps thugness", "toggled headshot only: "..tostring(headshot_only))
+  end
+
+  if input.KeyCode == getgenv().dps_settings["toggle_full_blatant"] then
+    full_blatant = not full_blatant
+    notify("dps thugness", "toggled full blatant: "..tostring(full_blatant))
   end
 
   if input.KeyCode == getgenv().dps_settings["toggle_silent"] then
@@ -245,11 +252,15 @@ utility.Raycast = function(...)
   if (#arguments > 0 and arguments[4] == 999) and togglwoggle == true then
     local closest = get_closest_player()
 
+    rand_str = random_strength
+    if full_blatant == true then
+        rand_str = 2
+    end
     if (closest) then
       if holdingt == true or grens == true or (math.random(1,5) == 1 and headshot_only == false) then
         arguments[3] = arguments[3]
       else 
-        arguments[3] = closest[getgenv().aimpart].Position + Vector3.new(math.random(-random_strength, random_strength) / 100, math.random(-5, 5) / 10, math.random(-random_strength, random_strength) / 100)
+        arguments[3] = closest[getgenv().aimpart].Position + Vector3.new(math.random(-rand_str, rand_str) / 100, math.random(-5, 5) / 10, math.random(-random_strength, random_strength) / 100)
       end
     end
   end
@@ -264,7 +275,7 @@ notify("dps thugness", "use the keybinds you set in the script", 20, "option")
 getgenv().dps_loaded = true
 
 while task.wait(0.1) do
-  if math.random(1, getgenv().dps_settings["normal_headshot_chance"]) == 1 or headshot_only == true then
+  if math.random(1, getgenv().dps_settings["normal_headshot_chance"]) == 1 or headshot_only == true or full_blatant == true then
     getgenv().aimpart = "Head"
   else
     local tug = math.random(1,3)
