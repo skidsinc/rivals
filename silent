@@ -12,12 +12,17 @@ if getgenv().dps_settings == nil then
     ["trash_talk"] = Enum.KeyCode.T,
     ["toggle_full_blatant"] = Enum.KeyCode.L,
 
+    ["go_invisible"] = Enum.KeyCode.X,
+    ["go_visible"] = Enum.KeyCode.Z,
+
     ["normal_headshot_chance"] = 4, -- eg 3 means 1 in 3 chance
     
     ["RGB_fists"] = false,
     ["RGB_esp"] = false,
     
     ["randomization_strength"] = 42, -- 0-100 only - less random = more blatant
+
+
   }
 end
 
@@ -44,6 +49,27 @@ local trash_talk = {"quit the game", "get better", "lock in bro", "try harder ne
 
 local function send_msg(msg)
   game:GetService("TextChatService").TextChannels.RBXGeneral:SendAsync(msg)
+end
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local Humanoid = Character:WaitForChild("Humanoid")
+
+local function go_invis()
+    local animation = Instance.new("Animation")
+    animation.AnimationId = "rbxassetid://86618254829597"
+    getgenv().dps_invis = LocalPlayer.Character.Humanoid:LoadAnimation(animation)
+    getgenv().dps_invis.Looped = true
+    getgenv().dps_invis.Priority = Enum.AnimationPriority.Action4
+    getgenv().dps_invis:Play()
+	getgenv().dps_invis:AdjustSpeed(50)
+end
+
+
+
+local function go_vis()
+  getgenv().dps_invis:Stop()
 end
 
 local function notify(head, desc, time, type)
@@ -117,6 +143,16 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
   if input.KeyCode == getgenv().dps_settings["toggle_silent"] then
     togglwoggle = not togglwoggle
     notify("dps thugness", "toggled silent aim: "..tostring(togglwoggle))
+  end
+
+  if input.KeyCode == getgenv().dps_settings["go_invisible"] then
+    go_invis()
+    notify("dps thugness", "you are now INVISIBLE")
+  end
+
+  if input.KeyCode == getgenv().dps_settings["go_visible"] then
+    go_vis()
+    notify("dps thugness", "you are now VISIBLE")
   end
 end)
 
@@ -288,5 +324,3 @@ while task.wait(0.1) do
     end
   end
 end
-
-
