@@ -11,6 +11,7 @@ if getgenv().dps_settings == nil then
     ["toggle_esp"] = Enum.KeyCode.P,
     ["trash_talk"] = Enum.KeyCode.T,
     ["toggle_full_blatant"] = Enum.KeyCode.L,
+    ["toggle_rage_bot"] = Enum.KeyCode.N,
 
     ["go_invisible"] = Enum.KeyCode.X,
     ["go_visible"] = Enum.KeyCode.Z,
@@ -23,8 +24,8 @@ if getgenv().dps_settings == nil then
     ["randomization_strength"] = 42, -- 0-100 only - less random = more blatant
 
     ["toggle_fly"] = Enum.KeyCode.K,
-    ["default_fly_speed"] = 50,
-    ["fast_fly_speed"] = 150, -- when holding down shift
+    ["default_fly_speed"] = 100,
+    ["fast_fly_speed"] = 250, -- when holding down shift
 
 
   }
@@ -54,6 +55,7 @@ local esp_toggle = true
 local headshot_only = false
 local togglwoggle = true
 local full_blatant = false
+local rage_bot = false
 local trash_talk = {"quit the game", "get better", "lock in bro", "try harder next time", "my nan has better aim", "your buns", "your my son", "doggie", "trash", "go aim train kid", "cry more", "wa wa wa wa", "yawn", "your just a skill issue", "boo hoo", "get better"}
 
 local function send_msg(msg)
@@ -113,7 +115,7 @@ end
 
 local function go_invis()
     local animation = Instance.new("Animation")
-    animation.AnimationId = "rbxassetid://86618254829597"
+    animation.AnimationId = "rbxassetid://90094153163920"
     getgenv().dps_invis = LocalPlayer.Character.Humanoid:LoadAnimation(animation)
     getgenv().dps_invis.Looped = true
     getgenv().dps_invis.Priority = Enum.AnimationPriority.Action4
@@ -197,6 +199,10 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
   if input.KeyCode == getgenv().dps_settings["toggle_full_blatant"] then
     full_blatant = not full_blatant
     notify("dps thugness", "toggled full blatant: "..tostring(full_blatant))
+  end
+  if input.KeyCode == getgenv().dps_settings["toggle_rage_bot"] then
+    rage_bot = not rage_bot
+    notify("dps thugness", "toggled rage bot: "..tostring(rage_bot))
   end
   if input.KeyCode == getgenv().dps_settings["toggle_fly"] then
 
@@ -283,7 +289,7 @@ local function esp_tt()
               addhighlight(player)
               for i,v in pairs(player:GetDescendants()) do
                 if v.Name == "HumanoidRootPart" then
-                  if IAMDPS == true then
+                  if IAMDPS == true and  player.Name ~= LocalPlayer.Name then
                     makemarker(v, v, Color3.fromRGB(255, 0, 0), 1, 0)
                   end
                   break
@@ -405,6 +411,22 @@ local get_closest_player = function()
     closest = player
     closest_distance = distance
   end
+  task.spawn(function()
+    pcall(function()
+      if rage_bot == true then
+        print("a")
+        for i,v in pairs(closest:GetDescendants()) do
+          if v.Name == "HumanoidRootPart" then
+            print("found")
+            if game:GetService("Players").LocalPlayer and game:GetService("Players").LocalPlayer.Character and game:GetService("Players").LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+              game:GetService("Players").LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame = v.CFrame * CFrame.new(0,15,0)
+            end
+            break
+          end
+        end
+      end
+    end)
+  end)
   return closest
 end
 
