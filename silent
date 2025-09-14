@@ -79,7 +79,7 @@ local originalGravity = workspace.Gravity
 
 local function fly()
     while flying do
-      pcall(function()
+
         local MoveDirection = Vector3.new()
         local cameraCFrame = workspace.CurrentCamera.CFrame
 
@@ -97,9 +97,9 @@ local function fly()
           end
           HumanoidRootPart.Velocity = MoveDirection * 0.5
         else
-          HumanoidRootPart.Velocity = Vector3.new(0, -1 0) 
+          HumanoidRootPart.Velocity = Vector3.new(0, 0, 0) 
         end
-      end)
+
 
       RunService.RenderStepped:Wait() 
     end
@@ -195,7 +195,7 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
   end
   if input.KeyCode == getgenv().dps_settings["toggle_fly"] then
     flying = not flying
-    notify("dps thugness", "toggled fly: "..tostring(flying))
+    notify("dps thugness", "toggled flight: "..tostring(flying))
     if flying then
       workspace.Gravity = 0 
       fly() 
@@ -438,3 +438,6 @@ while task.wait(0.1) do
     end
   end
 end
+
+
+
