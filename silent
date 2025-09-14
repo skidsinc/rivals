@@ -97,7 +97,7 @@ local function fly()
           end
           HumanoidRootPart.Velocity = MoveDirection * 0.5
         else
-          HumanoidRootPart.Velocity = Vector3.new(0, 0, 0) 
+          HumanoidRootPart.Velocity = Vector3.new(0, -1 0) 
         end
       end)
 
@@ -195,6 +195,7 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
   end
   if input.KeyCode == getgenv().dps_settings["toggle_fly"] then
     flying = not flying
+    notify("dps thugness", "toggled fly: "..tostring(flying))
     if flying then
       workspace.Gravity = 0 
       fly() 
