@@ -13,6 +13,7 @@ if getgenv().dps_settings == nil then
     ["toggle_full_blatant"] = Enum.KeyCode.L,
     ["toggle_rage_bot"] = Enum.KeyCode.N,
     ["toggle_rapid_fire"] = Enum.KeyCode.I,
+    ["toggle_autoclick"] = Enum.KeyCode.B,
 
     ["go_invisible"] = Enum.KeyCode.X,
     ["go_visible"] = Enum.KeyCode.Z,
@@ -37,7 +38,7 @@ getgenv().dps_loaded = false
 
 
 
-local IAMDPS = true
+local IAMDPS = false
 
 
 local Notification = loadstring(game:HttpGet("https://raw.githubusercontent.com/Jxereas/UI-Libraries/main/notification_gui_library.lua", true))()
@@ -59,6 +60,7 @@ local full_blatant = false
 local rage_bot = false
 local rage_bot_target = ""
 local rapid_fire = false
+local auto_click = false
 local trash_talk = {"quit the game", "get better", "lock in bro", "try harder next time", "my nan has better aim", "your buns", "your my son", "doggie", "trash", "go aim train kid", "cry more", "wa wa wa wa", "yawn", "your just a skill issue", "boo hoo", "get better"}
 
 local function send_msg(msg)
@@ -244,6 +246,11 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
     send_msg(randommsg)
   end
 
+
+  if input.KeyCode == getgenv().dps_settings["toggle_autoclick"] then
+    auto_click = not auto_click
+    notify("dps thugness", "toggled autoclicker: "..tostring(auto_click))
+  end
   if input.KeyCode == getgenv().dps_settings["toggle_headshot_only"] then
     headshot_only = not headshot_only
     notify("dps thugness", "toggled headshot only: "..tostring(headshot_only))
@@ -520,28 +527,57 @@ local camera = game.Workspace.CurrentCamera
 
 
 
+local angle = 1
+
 task.spawn(function()
-  while task.wait() do
-    task.spawn(function()
-      pcall(function()
-        if rage_bot == true then
-          flying = false
-          if rage_bot_target == "" then
-            rage_bot_target = get_closest_player()
+  while RunService.Heartbeat:Wait() do
+      task.spawn(function()
+        pcall(function()
+          if auto_click == true then
+            mouse1click()
           end
-          if (not rage_bot_target) or not (rage_bot_target:FindFirstChild("HumanoidRootPart")) then
-            rage_bot = false
-            notify("dps thugness", "toggled rage bot false - invalid target")
-            workspace.Gravity = originalGravity
-            rage_bot_target = ""
-          else
-            game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = rage_bot_target:FindFirstChild("HumanoidRootPart").CFrame * CFrame.new(math.random(-0.5,0.5),math.random(12,14),math.random(-0.5,0.5)) * CFrame.Angles(math.rad(-90), math.rad(math.random(0,2)), math.rad(math.random(0,360)))
-            camera.CFrame = rage_bot_target:FindFirstChild("HumanoidRootPart").CFrame
-            game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Velocity = Vector3.new(math.random(-10,10), math.random(10,20), math.random(-10,10))
-          end
-        end
+        end)
       end)
-    end)
+      task.spawn(function()
+          pcall(function()
+              if rage_bot == true then
+                  flying = false
+                  if rage_bot_target == "" then
+                      rage_bot_target = get_closest_player()
+                  end
+                  if (not rage_bot_target) or not (rage_bot_target:FindFirstChild("HumanoidRootPart")) then
+                      rage_bot = false
+                      notify("dps thugness", "toggled rage bot false - invalid target")
+                      workspace.Gravity = originalGravity
+                      rage_bot_target = ""
+                  else
+                      local targetRoot = rage_bot_target:FindFirstChild("HumanoidRootPart")
+                      local radius = math.random(4, 6)
+                      angle = angle + math.rad(10)
+                      if angle >= math.pi * 2 then
+                          angle = 0
+                      end
+
+                      local orbitX = math.cos(angle) * radius
+                      local orbitZ = math.sin(angle) * radius
+                      local orbitY = math.random(4, 12)
+
+                      game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame =
+                          targetRoot.CFrame * CFrame.new(orbitX, orbitY, orbitZ)
+
+                      local alpha = 1
+
+                      camera.CFrame = camera.CFrame:Lerp(
+                          CFrame.lookAt(camera.CFrame.Position, targetRoot.Position),
+                          alpha
+                      )
+
+                      game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Velocity =
+                          Vector3.new(math.random(-10,10), math.random(10,20), math.random(-10,10))
+                  end
+              end
+          end)
+      end)
   end
 end)
 
