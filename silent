@@ -84,6 +84,8 @@ local flySpeed = getgenv().dps_settings["default_fly_speed"]
 local originalGravity = workspace.Gravity
 
 
+
+
 local function fly()
     while flying do
       pcall(function()
@@ -158,6 +160,12 @@ local function addhighlight(part)
   end)
 end
 
+
+
+
+
+
+
 notify("dps thugness", "attempting to load...", 5)
 
 task.spawn(function()
@@ -190,7 +198,7 @@ local function scanTable(t, visited, modify)
                     originalValues[t][k] = v -- store original only once
                 end
                 print("Found:", k, "->", tostring(v), " (setting to 0)")
-                t[k] = 0.02
+                t[k] = 0.03
             end
         end
         if type(v) == "table" then
@@ -521,6 +529,122 @@ notify("dps thugness", "please only switch to grenades using number keys", 20, "
 notify("dps thugness", "use the keybinds you set in the script", 20, "option")
 
 
+local namesString = loadstring(game:HttpGet("https://raw.githubusercontent.com/skidsinc/rivals/refs/heads/main/ranked_cheaters", true))()
+
+
+local namesList = {}
+for name in namesString:gmatch("[^\r\n]+") do
+    table.insert(namesList, name)
+end
+
+
+local function checkPlayer(player)
+    if table.find(namesList, player.Name) then
+        print(player.Name .. " found!")
+        notify("dps thugness (CHEATER)", player.Name.." has been flagged by dps as a cheater", 5)
+    end
+end
+
+for _, player in ipairs(Players:GetPlayers()) do
+    checkPlayer(player)
+end
+Players.PlayerAdded:Connect(checkPlayer)
+
+
+task.spawn(function()
+  pcall(function()
+    local function getallthreads()
+      local threads = {}
+
+        for _, item in getreg() do
+            if type(item) == 'thread' then
+                table.insert(threads, item)
+            end
+        end
+
+        return threads
+    end
+
+    local BadCallers = {
+        "MiscController",
+        "CameraSecurity",
+        "ClientFighter",
+    }
+
+    local LogBlock = function(Source)
+        warn("Detection attempt from", Source, "blocked!")
+    end
+
+    local LogHook = function(Function, Source)
+        warn("Hooked detection function", Function, "from", Source)
+    end
+
+    local LogService = game:GetService("LogService")
+
+    local function ScanAC()
+
+        for i, v in next, getgc() do
+            if type(v) == 'function' and islclosure(v) and (not isexecutorclosure(v)) then
+                local Constants = debug.getconstants(v)
+                local Source = debug.info(v, "s")
+                if table.find(Constants, "FireServer") and table.find(Constants, "random") and table.find(Constants, "utf8") then
+                    LogHook(v, Source)
+                    hookfunction(v, function()
+                        return Instance.new("BindableEvent").Event:Wait()
+                    end)
+                end
+            end
+        end
+
+        for _, thread in next, getallthreads() do
+            local ThreadFunction = debug.info(thread, 1, "f")
+
+            if ThreadFunction and islclosure(ThreadFunction) and (not isexecutorclosure(ThreadFunction)) then
+                local Constants = debug.getconstants(ThreadFunction)
+
+                if table.find(Constants, "FireServer") and table.find(Constants, "random") and table.find(Constants, "utf8") then
+                    warn("Killed detection thread", thread, "@", debug.info(thread, 1, "s"))
+                    coroutine.close(thread)
+                end
+            end
+        end
+    end
+
+    ScanAC()
+
+    LogService.MessageOut:Connect(function(Message, Type)
+        if Type == Enum.MessageType.MessageOutput then
+            if Message:find("loaded") then
+                ScanAC()
+            end
+        end
+    end)
+
+    local OldNamecall
+    OldNamecall = hookmetamethod(game, "__namecall", function(...)
+        local Args = { ... }
+        local Self = table.remove(Args, 1)
+
+        if getnamecallmethod() == "FireServer" and typeof(Self) == "Instance" and Self.ClassName == "RemoteEvent" then
+
+            if Self.Name == "UseItem" then
+                local CallingScript = getcallingscript()
+
+                if table.find(BadCallers, CallingScript.Name) then
+                    LogBlock(CallingScript.Name)
+                    return wait(9e9)
+                end
+
+            end
+        end
+
+        return OldNamecall(...)
+    end)
+  
+  end)
+
+end)
+
 getgenv().dps_loaded = true
 
 local camera = game.Workspace.CurrentCamera
@@ -552,7 +676,7 @@ task.spawn(function()
                       rage_bot_target = ""
                   else
                       local targetRoot = rage_bot_target:FindFirstChild("HumanoidRootPart")
-                      local radius = math.random(4, 6)
+                      local radius = math.random(2, 5)
                       angle = angle + math.rad(10)
                       if angle >= math.pi * 2 then
                           angle = 0
@@ -560,7 +684,7 @@ task.spawn(function()
 
                       local orbitX = math.cos(angle) * radius
                       local orbitZ = math.sin(angle) * radius
-                      local orbitY = math.random(4, 12)
+                      local orbitY = math.random(1, 4)
 
                       game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame =
                           targetRoot.CFrame * CFrame.new(orbitX, orbitY, orbitZ)
@@ -568,7 +692,7 @@ task.spawn(function()
                       local alpha = 1
 
                       camera.CFrame = camera.CFrame:Lerp(
-                          CFrame.lookAt(camera.CFrame.Position, targetRoot.Position),
+                          CFrame.new(camera.CFrame.Position, targetRoot.Position),
                           alpha
                       )
 
