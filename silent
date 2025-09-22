@@ -38,7 +38,7 @@ getgenv().dps_loaded = false
 
 
 
-local IAMDPS = false
+local IAMDPS = true
 
 
 local Notification = loadstring(game:HttpGet("https://raw.githubusercontent.com/Jxereas/UI-Libraries/main/notification_gui_library.lua", true))()
@@ -583,18 +583,6 @@ task.spawn(function()
 
     local function ScanAC()
 
-        for i, v in next, getgc() do
-            if type(v) == 'function' and islclosure(v) and (not isexecutorclosure(v)) then
-                local Constants = debug.getconstants(v)
-                local Source = debug.info(v, "s")
-                if table.find(Constants, "FireServer") and table.find(Constants, "random") and table.find(Constants, "utf8") then
-                    LogHook(v, Source)
-                    hookfunction(v, function()
-                        return Instance.new("BindableEvent").Event:Wait()
-                    end)
-                end
-            end
-        end
 
         for _, thread in next, getallthreads() do
             local ThreadFunction = debug.info(thread, 1, "f")
