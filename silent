@@ -49,7 +49,7 @@ end)
 
 
 
-local IAMDPS = false
+local IAMDPS = true
 
 
 local Notification = loadstring(game:HttpGet("https://raw.githubusercontent.com/Jxereas/UI-Libraries/main/notification_gui_library.lua", true))()
@@ -733,7 +733,7 @@ utility.Raycast = function(...)
 				arguments[3] = arguments[3];
 			else
 				if (math.random(1,2) == 1 or auto_click == true) and holdingm1 == true then
-					camera.CFrame = CFrame.new(camera.CFrame.Position, (closest[getgenv().aimpart].Position + Vector3.new(math.random(-random_strength, random_strength) / 100, math.random(-5, 5) / 10, math.random(-random_strength, random_strength) / 100)))
+					--camera.CFrame = CFrame.new(camera.CFrame.Position, (closest[getgenv().aimpart].Position + Vector3.new(math.random(-random_strength, random_strength) / 100, math.random(-5, 5) / 10, math.random(-random_strength, random_strength) / 100)))
 				end
 				arguments[3] = closest[getgenv().aimpart].Position + Vector3.new(math.random(-random_strength, random_strength) / 100, math.random(-5, 5) / 10, math.random(-random_strength, random_strength) / 100);
 			end
