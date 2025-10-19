@@ -36,9 +36,20 @@ end
 getgenv().dps_loaded = false
 
 
+task.spawn(function()
+pcall(function ()
+	for _,v in getgc() do
+		if typeof(v) == "thread" and string.find(debug.info(v, 1, "s") or "", "AnalyticsPipelineController") then
+			task.cancel(v)
+		end
+	end
+end)
+end)
 
 
-local IAMDPS = true
+
+
+local IAMDPS = false
 
 
 local Notification = loadstring(game:HttpGet("https://raw.githubusercontent.com/Jxereas/UI-Libraries/main/notification_gui_library.lua", true))()
@@ -730,11 +741,27 @@ utility.Raycast = function(...)
 	end
 	return old(table.unpack(arguments));
 end
-
+task.spawn(function()
+pcall(function()
+	for _,v in getgc() do
+		if typeof(v) == "thread" and string.find(debug.info(v, 1, "s") or "", "AnalyticsPipelineController") then
+			task.cancel(v)
+		end
+	end
+end)
+end)
 
 --anti ac
 queue_on_teleport([[
-
+task.spawn(function()
+pcall(function()
+	for _,v in getgc() do
+		if typeof(v) == "thread" and string.find(debug.info(v, 1, "s") or "", "AnalyticsPipelineController") then
+			task.cancel(v)
+		end
+	end
+end)
+end)
 task.spawn(function()
   pcall(function()
     local function getallthreads()
