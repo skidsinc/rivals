@@ -3,6 +3,135 @@
 --silent aim was 'borrow' and get player function was 'borrowed' and modified
 
 
+if not game:IsLoaded() then
+    game.Loaded:Wait()
+end
+if game.GameId ~= 6035872082 then
+    return
+end
+
+game:GetService("ScriptContext"):SetTimeout(1)
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+repeat
+    task.wait()
+until LocalPlayer
+print("Rivals Anticheat Disabler executed!")
+local success, err = pcall(function()
+    assert(getgc, "executor missing required function getgc")
+    assert(debug and debug.info, "executor missing required function debug.info (somehow)")
+    assert(hookfunction, "executor missing required function hookfunction")
+    assert(getconnections, "executor missing required function getconnections")
+    assert(newcclosure, "executor missing required function newcclosure")
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local LogService = game:GetService("LogService")
+    local ScriptContext = game:GetService("ScriptContext")
+    task.spawn(function()
+        local hooked = 0
+        for _, v in pairs(getgc(true)) do
+			task.wait()
+            if typeof(v) == "function" then
+                local ok, src = pcall(function()
+                    return debug.info(v, "s")
+                end)
+                if ok and type(src) == "string" and string.find(src, "AnalyticsPipelineController") then
+                    hooked += 1
+                    local oldfn
+                    oldfn = hookfunction(v, newcclosure(function(...)
+                        return wait(9e9)
+                    end))
+                end
+            end
+        end
+    end)
+    task.spawn(function()
+        local ok, remote = pcall(function()
+            return ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("AnalyticsPipeline"):WaitForChild("RemoteEvent")
+        end)
+        if ok and remote and remote.OnClientEvent then
+            local hooked = 0
+            for _, conn in pairs(getconnections(remote.OnClientEvent)) do
+                task.wait()
+				if conn and conn.Function then
+                    if pcall(function()
+                        hookfunction(conn.Function, newcclosure(function(...)
+                        end))
+                    end) then 
+                        hooked += 1
+                    end
+                end
+            end
+        end
+    end)
+    task.spawn(function()
+        local hooked = 0
+        for _, conn in pairs(getconnections(LogService.MessageOut)) do
+            task.wait()
+			if conn and conn.Function then
+                if pcall(function()
+                    hookfunction(conn.Function, newcclosure(function(...)
+                    end))
+                end) then
+                    hooked += 1
+                end
+            end
+        end
+    end)
+    task.spawn(function()
+        local hooked = 0
+        for _, conn in ipairs(getconnections(ScriptContext.Error)) do
+            task.wait()
+			if pcall(function()
+                conn:Disable()
+            end) then
+                hooked += 1
+            end
+        end
+        pcall(function()
+            hookfunction(ScriptContext.Error.Connect, newcclosure(function(...)
+                return nil
+            end))
+        end)
+    end)
+    task.spawn(function()
+        local KickNames = {
+            "Kick",
+            "kick"
+        }
+        for _, name in ipairs(KickNames) do
+            task.wait()
+			local fn = LocalPlayer[name]
+            if type(fn) == "function" then
+                local oldkick
+                oldkick = hookfunction(fn, newcclosure(function(self, ...)
+                    if self == LocalPlayer then
+                        return
+                    end
+                    return oldkick(self, ...)
+                end))
+            end
+        end
+    end)
+end)
+wait(0.5)
+if not success then
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+    	Title = "Rivals Anticheat Disabler",
+    	Text = "Error, please check console",
+    	Duration = 5
+    })
+    print("Rivals Anticheat Disabler failed: " .. tostring(err))
+else
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+    	Title = "Rivals Anticheat Disabler",
+    	Text = "Successfully disabled anticheat!",
+    	Duration = 5
+    })
+end
+
+wait(0.5)
+
 
 if getgenv().dps_settings == nil then
 	getgenv().dps_settings = {
@@ -11,14 +140,14 @@ if getgenv().dps_settings == nil then
 		["toggle_esp"] = Enum.KeyCode.P,
 		["trash_talk"] = Enum.KeyCode.T,
 		["toggle_full_blatant"] = Enum.KeyCode.L,
-		["toggle_rage_bot"] = Enum.KeyCode.N,
+		--["toggle_rage_bot"] = Enum.KeyCode.N,
 		["toggle_rapid_fire"] = Enum.KeyCode.I,
 		["toggle_autoclick"] = Enum.KeyCode.B,
 
 		["go_invisible"] = Enum.KeyCode.X,
 		["go_visible"] = Enum.KeyCode.Z,
 
-		["normal_headshot_chance"] = 4, -- eg 3 means 1 in 3 chance
+		["normal_headshot_chance"] = 8, -- eg 3 means 1 in 3 chance
 		
 		["RGB_fists"] = false,
 		["RGB_esp"] = false,
@@ -34,17 +163,19 @@ if getgenv().dps_settings == nil then
 end
 
 getgenv().dps_loaded = false
+loadacbypass = false
 
-
-task.spawn(function()
-pcall(function ()
-	for _,v in getgc() do
-		if typeof(v) == "thread" and string.find(debug.info(v, 1, "s") or "", "AnalyticsPipelineController") then
-			task.cancel(v)
+if loadacbypass == true then
+	task.spawn(function()
+	pcall(function ()
+		for _,v in getgc() do
+			if typeof(v) == "thread" and string.find(debug.info(v, 1, "s") or "", "AnalyticsPipelineController") then
+				task.cancel(v)
+			end
 		end
-	end
-end)
-end)
+	end)
+	end)
+end
 
 
 
@@ -69,7 +200,7 @@ local holdingm1 = false
 local grens = false
 local esp_toggle = true
 local headshot_only = false
-local togglwoggle = true
+local togglwoggle = false -- silent
 local full_blatant = false
 local rage_bot = false
 local rage_bot_target = ""
@@ -732,119 +863,137 @@ utility.Raycast = function(...)
 			if holdingt == true or grens == true or math.random(1,5) == 1 then
 				arguments[3] = arguments[3];
 			else
-				if (math.random(1,2) == 1 or auto_click == true) and holdingm1 == true then
-					--camera.CFrame = CFrame.new(camera.CFrame.Position, (closest[getgenv().aimpart].Position + Vector3.new(math.random(-random_strength, random_strength) / 100, math.random(-5, 5) / 10, math.random(-random_strength, random_strength) / 100)))
-				end
 				arguments[3] = closest[getgenv().aimpart].Position + Vector3.new(math.random(-random_strength, random_strength) / 100, math.random(-5, 5) / 10, math.random(-random_strength, random_strength) / 100);
 			end
 		end
 	end
 	return old(table.unpack(arguments));
 end
-task.spawn(function()
-pcall(function()
-	for _,v in getgc() do
-		if typeof(v) == "thread" and string.find(debug.info(v, 1, "s") or "", "AnalyticsPipelineController") then
-			task.cancel(v)
-		end
-	end
-end)
-end)
+
 
 --anti ac
-queue_on_teleport([[
-task.spawn(function()
-pcall(function()
-	for _,v in getgc() do
-		if typeof(v) == "thread" and string.find(debug.info(v, 1, "s") or "", "AnalyticsPipelineController") then
-			task.cancel(v)
+if loadacbypass == true then
+	queue_on_teleport([[
+	task.spawn(function()
+	pcall(function()
+		for _,v in getgc() do
+			if typeof(v) == "thread" and string.find(debug.info(v, 1, "s") or "", "AnalyticsPipelineController") then
+				task.cancel(v)
+			end
+		end
+	end)
+	end)
+	task.spawn(function()
+	pcall(function()
+		local TargetEnvironment = nil
+
+	for _, Function in getgc(false) do
+		if typeof(Function) ~= "function" then continue end
+		if not islclosure(Function) then continue end
+		if not getinfo(Function).source:find("ReplicatedFirst", 1) then continue end
+		if getfenv(Function).script ~= nil then continue end
+		if getinfo(Function).name ~= "B" then continue end -- UID for the environment
+	
+		TargetEnvironment = getfenv(Function).script -- Env grabbed
+		break
+	end
+	
+	end)
+
+	end)
+	task.spawn(function()
+	local function getallthreads()
+		local threads = {}
+
+		for _, item in getreg() do
+			if type(item) == 'thread' then
+				table.insert(threads, item)
+			end
+		end
+
+		return threads
+	end
+
+	local BadCallers = {
+		"MiscController",
+		"CameraSecurity",
+		"ClientFighter",
+	}
+
+	local LogBlock = function(Source)
+		warn("Detection attempt from", Source, "blocked!")
+	end
+
+	local LogHook = function(Function, Source)
+		warn("Hooked detection function", Function, "from", Source)
+	end
+
+	local LogService = game:GetService("LogService")
+
+	local function ScanAC()
+
+		for i, v in next, getgc() do
+			if type(v) == 'function' and islclosure(v) and (not isexecutorclosure(v)) then
+				local Constants = debug.getconstants(v)
+				local Source = debug.info(v, "s")
+				if table.find(Constants, "FireServer") and table.find(Constants, "random") and table.find(Constants, "utf8") then
+					LogHook(v, Source)
+					hookfunction(v, function() -- crashes here
+						return Instance.new("BindableEvent").Event:Wait()
+					end)
+				end
+			end
+		end
+
+		for _, thread in next, getallthreads() do
+			local ThreadFunction = debug.info(thread, 1, "f")
+
+			if ThreadFunction and islclosure(ThreadFunction) and (not isexecutorclosure(ThreadFunction)) then
+				local Constants = debug.getconstants(ThreadFunction)
+
+				if table.find(Constants, "FireServer") and table.find(Constants, "random") and table.find(Constants, "utf8") then
+					warn("Killed detection thread", thread, "@", debug.info(thread, 1, "s"))
+					coroutine.close(thread)
+				end
+			end
 		end
 	end
-end)
-end)
-task.spawn(function()
-  pcall(function()
-    local function getallthreads()
-      local threads = {}
 
-        for _, item in getreg() do
-            if type(item) == 'thread' then
-                table.insert(threads, item)
-            end
-        end
+	ScanAC()
 
-        return threads
-    end
+	LogService.MessageOut:Connect(function(Message, Type)
+		if Type == Enum.MessageType.MessageOutput then
+			if Message:find("loaded") then
+				ScanAC()
+			end
+		end
+	end)
 
-    local BadCallers = {
-        "MiscController",
-        "CameraSecurity",
-        "ClientFighter",
-    }
+	local OldNamecall
+	OldNamecall = hookmetamethod(game, "__namecall", function(...)
+		local Args = { ... }
+		local Self = table.remove(Args, 1)
 
-    local LogBlock = function(Source)
-        warn("Detection attempt from", Source, "blocked!")
-    end
+		if getnamecallmethod() == "FireServer" and typeof(Self) == "Instance" and Self.ClassName == "RemoteEvent" then
 
-    local LogHook = function(Function, Source)
-        warn("Hooked detection function", Function, "from", Source)
-    end
+			if Self.Name == "UseItem" then
+				local CallingScript = getcallingscript()
 
-    local LogService = game:GetService("LogService")
+				if table.find(BadCallers, CallingScript.Name) then
+					LogBlock(CallingScript.Name)
+					return wait(9e9)
+				end
 
-    local function ScanAC()
+			end
+		end
 
+		return OldNamecall(...)
+	end)
 
-        for _, thread in next, getallthreads() do
-            local ThreadFunction = debug.info(thread, 1, "f")
+	end)
 
-            if ThreadFunction and islclosure(ThreadFunction) and (not isexecutorclosure(ThreadFunction)) then
-                local Constants = debug.getconstants(ThreadFunction)
-
-                if table.find(Constants, "FireServer") and table.find(Constants, "random") and table.find(Constants, "utf8") then
-                    warn("Killed detection thread", thread, "@", debug.info(thread, 1, "s"))
-                    coroutine.close(thread)
-                end
-            end
-        end
-    end
-
-    ScanAC()
-
-    LogService.MessageOut:Connect(function(Message, Type)
-        if Type == Enum.MessageType.MessageOutput then
-            if Message:find("loaded") then
-                ScanAC()
-            end
-        end
-    end)
-
-    local OldNamecall
-    OldNamecall = hookmetamethod(game, "__namecall", function(...)
-        local Args = { ... }
-        local Self = table.remove(Args, 1)
-
-        if getnamecallmethod() == "FireServer" and typeof(Self) == "Instance" and Self.ClassName == "RemoteEvent" then
-
-            if Self.Name == "UseItem" then
-                local CallingScript = getcallingscript()
-
-                if table.find(BadCallers, CallingScript.Name) then
-                    LogBlock(CallingScript.Name)
-                    return wait(9e9)
-                end
-
-            end
-        end
-
-        return OldNamecall(...)
-    end)
-  
-  end)
-
-end)
-
-]])
+	]])
+end
 
 while task.wait(0.1) do
 	if math.random(1, getgenv().dps_settings["normal_headshot_chance"]) == 1 or headshot_only == true or full_blatant == true then
