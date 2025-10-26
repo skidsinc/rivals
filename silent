@@ -1009,34 +1009,3 @@ while task.wait(0.1) do
 end
 
 
-
-queue_on_teleport([[
-	task.wait(2)
-    getgenv().dps_settings = {
-        ["toggle_silent"] = Enum.KeyCode.V,
-        ["toggle_headshot_only"] = Enum.KeyCode.O,
-        ["toggle_esp"] = Enum.KeyCode.P,
-        ["trash_talk"] = Enum.KeyCode.T,
-        ["toggle_full_blatant"] = Enum.KeyCode.L,
-        --["toggle_rage_bot"] = Enum.KeyCode.N,
-        ["toggle_rapid_fire"] = Enum.KeyCode.I,
-        ["toggle_autoclick"] = Enum.KeyCode.B,
-
-        ["go_invisible"] = Enum.KeyCode.X,
-        ["go_visible"] = Enum.KeyCode.Z,
-
-        ["normal_headshot_chance"] = 8, -- eg 3 means 1 in 3 chance
-        
-        ["RGB_fists"] = true,
-        ["RGB_esp"] = true,
-        
-        ["randomization_strength"] = 40, -- 0-100 only - less random = more blatant
-
-        ["toggle_fly"] = Enum.KeyCode.K,
-        ["default_fly_speed"] = 100,
-        ["fast_fly_speed"] = 250, -- when holding down shift
-
-
-    }
-loadstring(game:HttpGet("https://gist.githubusercontent.com/skidsinc/5e757fb12f5d0baf7755210d22a99f69/raw/a128060a886b3089f05f6b8b22d17367fc4843fa/gistfile1.txt"))()
-]])
