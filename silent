@@ -616,7 +616,7 @@ task.spawn(function()
 end)
 
 task.spawn(function()
-	while task.wait(1) do
+	while task.wait() do
 		getgenv().rgb_hue = getgenv().rgb_hue + 0.05
 		if getgenv().rgb_hue > 1 then
 			getgenv().rgb_hue = 0
