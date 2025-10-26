@@ -1011,6 +1011,7 @@ end
 
 
 queue_on_teleport([[
+	task.wait(2)
     getgenv().dps_settings = {
         ["toggle_silent"] = Enum.KeyCode.V,
         ["toggle_headshot_only"] = Enum.KeyCode.O,
