@@ -161,7 +161,7 @@ if getgenv().dps_settings == nil then
 		["toggle_full_blatant"] = Enum.KeyCode.L,
 		["toggle_legit_mode"] = Enum.KeyCode.U,
 		["normal_hit_chance"] = 6,
-		["legit_hit_chance"] = 15,
+		["legit_hit_chance"] = 2,
 
 
 	}
@@ -905,9 +905,9 @@ utility.Raycast = function(...)
 		--local closest = get_closest_player()
 
 		local success, closest = pcall(get_closest_player)
-		local rng = getgenv().dps_settings["normal_hit_chance"]
+		local rng = getgenv().dps_settings["normal_hit_chance"] * 10
 		if legit_mode == true then
-			rng = getgenv().dps_settings["legit_hit_chance"]
+			rng = getgenv().dps_settings["legit_hit_chance"] * 10
 		end
 		if success and closest then
 			if holdingt == true or grens == true or math.random(1,rng) == 1 then
@@ -1057,7 +1057,6 @@ while task.wait(0.1) do
 		end
 	end
 end
-
 
 
 
