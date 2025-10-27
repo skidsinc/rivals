@@ -149,8 +149,8 @@ if getgenv().dps_settings == nil then
 
 		["normal_headshot_chance"] = 8, -- eg 3 means 1 in 3 chance
 		
-		["RGB_fists"] = false,
-		["RGB_esp"] = false,
+		["RGB_fists"] = true,
+		["RGB_esp"] = true,
 		
 		["randomization_strength"] = 40, -- 0-100 only - less random = more blatant
 
@@ -547,24 +547,24 @@ getgenv().rgb_hue = 0
 
 function makemarker(Parent, Adornee, Color, Size, Size2)
 	pcall(function()
-		local e = Instance.new("BillboardGui", Parent)
-		e.Name = "PP"
-		e.Adornee = Adornee
-		e.Size = UDim2.new(Size, Size2, Size, Size2)
-		e.AlwaysOnTop = true
+local e = Instance.new("BillboardGui", Parent)
+e.Name = "PP"
+e.Adornee = Adornee
+e.Size = UDim2.new(Size, Size2, Size, Size2)
+e.AlwaysOnTop = true
 
-		local a = Instance.new("Frame", e)
-		a.Size = UDim2.new(1, 0, 1, 0)
-
-		a.Transparency = 0
-		a.BackgroundTransparency = 0
-
-		a.BackgroundColor3 = Color
-		local g = Instance.new("UICorner", a)
-		g.CornerRadius = UDim.new(1, 1)
+local bob = Instance.new("TextLabel", e)
+bob.Name = "thug"
+bob.Text = "150"
+bob.Size = UDim2.new(0, 35, 0, 15)
+bob.BackgroundTransparency = 1
+bob.TextColor3 = Color3.fromRGB(255, 255, 255)
+bob.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+bob.TextStrokeTransparency = 0
+bob.Font = Enum.Font.SourceSansBold
+bob.TextScaled = true
 	end)
 end
-
 local function esp_tt()
 		task.spawn(function()
 			for _, player in getgenv().current_players do
@@ -585,6 +585,7 @@ local function esp_tt()
 						end
 
 						if player:FindFirstChild("dpsthug") then
+							player.HumanoidRootPart:FindFirstChild("PP"):FindFirstChild("thug").Text = tostring(math.floor(player.Humanoid.Health))
 							if esp_toggle == false then
 								player:FindFirstChild("dpsthug"):Destroy()
 								for i,v in pairs(player:GetDescendants()) do
@@ -595,7 +596,8 @@ local function esp_tt()
 										break
 									end
 								end
-							elseif getgenv().dps_settings["RGB_esp"] == true then
+							end
+							if getgenv().dps_settings["RGB_esp"] == true and player:FindFirstChild("dpsthug") then
 								player:FindFirstChild("dpsthug").FillColor = Color3.fromHSV(getgenv().rgb_hue, 1, 1)
 							end
 						end
@@ -615,9 +617,14 @@ task.spawn(function()
 	end
 end)
 
+local effect = 0.01
 task.spawn(function()
-	while task.wait(0.05) do
-		getgenv().rgb_hue = getgenv().rgb_hue + 0.015
+	while task.wait(effect) do
+		effect = effect + 0.01
+		if effect > 0.15 then
+			effect = 0.01
+		end
+		getgenv().rgb_hue = getgenv().rgb_hue + (math.random(10,15) / 1000) 
 		if getgenv().rgb_hue > 1 then
 			getgenv().rgb_hue = 0
 		end
@@ -1007,5 +1014,6 @@ while task.wait(0.1) do
 		end
 	end
 end
+
 
 
