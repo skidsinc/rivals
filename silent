@@ -278,13 +278,13 @@ local LocalPlayer = Players.LocalPlayer
 local anim_id = "rbxassetid://90094153163920"
 local is_invis = false
 
-local CAS = game:GetService("ContextActionService")
+local CASa = game:GetService("ContextActionService")
 
 local function disableLeftControl()
 	if LocalPlayer.Name == "69Rivals67pro69" then
 		task.spawn(function()
 pcall(function()
-	CAS:BindAction("BlockLeftControl", function()
+	CASa:BindAction("BlockLeftControl", function()
 		return Enum.ContextActionResult.Sink  -- consume input, block key
 	end, false, Enum.KeyCode.LeftControl)
 end)
@@ -295,7 +295,7 @@ end
 local function enableLeftControl()
 task.spawn(function()
 pcall(function()
-	CAS:UnbindAction("BlockLeftControl")
+	CASa:UnbindAction("BlockLeftControl")
 end)
 end)
 end
