@@ -161,7 +161,7 @@ if getgenv().dps_settings == nil then
 		["toggle_full_blatant"] = Enum.KeyCode.L,
 		["toggle_legit_mode"] = Enum.KeyCode.U,
 		["normal_hit_chance"] = 6,
-		["legit_hit_chance"] = 2,
+		["legit_hit_chance"] = 1.2,
 
 
 	}
@@ -898,6 +898,7 @@ end)
 
 local random_strength = getgenv().dps_settings["randomization_strength"]
 local old = utility.Raycast
+local hitchance = true
 utility.Raycast = function(...)
 	local arguments = {...};
 
@@ -905,12 +906,8 @@ utility.Raycast = function(...)
 		--local closest = get_closest_player()
 
 		local success, closest = pcall(get_closest_player)
-		local rng = getgenv().dps_settings["normal_hit_chance"] * 10
-		if legit_mode == true then
-			rng = getgenv().dps_settings["legit_hit_chance"] * 10
-		end
 		if success and closest then
-			if holdingt == true or grens == true or math.random(1,rng) == 1 then
+			if holdingt == true or grens == true or hitchance == false then
 				arguments[3] = arguments[3];
 			else
 				arguments[3] = closest[getgenv().aimpart].Position + Vector3.new(math.random(-random_strength, random_strength) / 100, math.random(-5, 5) / 10, math.random(-random_strength, random_strength) / 100);
@@ -921,131 +918,17 @@ utility.Raycast = function(...)
 end
 
 
---anti ac
-if loadacbypass == true then
-	queue_on_teleport([[
-	task.spawn(function()
-	pcall(function()
-		for _,v in getgc() do
-			if typeof(v) == "thread" and string.find(debug.info(v, 1, "s") or "", "AnalyticsPipelineController") then
-				task.cancel(v)
-			end
-		end
-	end)
-	end)
-	task.spawn(function()
-	pcall(function()
-		local TargetEnvironment = nil
-
-	for _, Function in getgc(false) do
-		if typeof(Function) ~= "function" then continue end
-		if not islclosure(Function) then continue end
-		if not getinfo(Function).source:find("ReplicatedFirst", 1) then continue end
-		if getfenv(Function).script ~= nil then continue end
-		if getinfo(Function).name ~= "B" then continue end -- UID for the environment
-	
-		TargetEnvironment = getfenv(Function).script -- Env grabbed
-		break
+while task.wait(0.05) do
+	local rng = getgenv().dps_settings["normal_hit_chance"] * 10
+	if legit_mode == true then
+		rng = getgenv().dps_settings["legit_hit_chance"] * 10
 	end
-	
-	end)
-
-	end)
-	task.spawn(function()
-	local function getallthreads()
-		local threads = {}
-
-		for _, item in getreg() do
-			if type(item) == 'thread' then
-				table.insert(threads, item)
-			end
-		end
-
-		return threads
+	if math.random(1, rng) <= 10 then
+		hitchance = false
+	else
+		hitchance = true
 	end
 
-	local BadCallers = {
-		"MiscController",
-		"CameraSecurity",
-		"ClientFighter",
-	}
-
-	local LogBlock = function(Source)
-		warn("Detection attempt from", Source, "blocked!")
-	end
-
-	local LogHook = function(Function, Source)
-		warn("Hooked detection function", Function, "from", Source)
-	end
-
-	local LogService = game:GetService("LogService")
-
-	local function ScanAC()
-
-		for i, v in next, getgc() do
-			if type(v) == 'function' and islclosure(v) and (not isexecutorclosure(v)) then
-				local Constants = debug.getconstants(v)
-				local Source = debug.info(v, "s")
-				if table.find(Constants, "FireServer") and table.find(Constants, "random") and table.find(Constants, "utf8") then
-					LogHook(v, Source)
-					hookfunction(v, function() -- crashes here
-						return Instance.new("BindableEvent").Event:Wait()
-					end)
-				end
-			end
-		end
-
-		for _, thread in next, getallthreads() do
-			local ThreadFunction = debug.info(thread, 1, "f")
-
-			if ThreadFunction and islclosure(ThreadFunction) and (not isexecutorclosure(ThreadFunction)) then
-				local Constants = debug.getconstants(ThreadFunction)
-
-				if table.find(Constants, "FireServer") and table.find(Constants, "random") and table.find(Constants, "utf8") then
-					warn("Killed detection thread", thread, "@", debug.info(thread, 1, "s"))
-					coroutine.close(thread)
-				end
-			end
-		end
-	end
-
-	ScanAC()
-
-	LogService.MessageOut:Connect(function(Message, Type)
-		if Type == Enum.MessageType.MessageOutput then
-			if Message:find("loaded") then
-				ScanAC()
-			end
-		end
-	end)
-
-	local OldNamecall
-	OldNamecall = hookmetamethod(game, "__namecall", function(...)
-		local Args = { ... }
-		local Self = table.remove(Args, 1)
-
-		if getnamecallmethod() == "FireServer" and typeof(Self) == "Instance" and Self.ClassName == "RemoteEvent" then
-
-			if Self.Name == "UseItem" then
-				local CallingScript = getcallingscript()
-
-				if table.find(BadCallers, CallingScript.Name) then
-					LogBlock(CallingScript.Name)
-					return wait(9e9)
-				end
-
-			end
-		end
-
-		return OldNamecall(...)
-	end)
-
-	end)
-
-	]])
-end
-
-while task.wait(0.1) do
 	if math.random(1, getgenv().dps_settings["normal_headshot_chance"]) == 1 or headshot_only == true or full_blatant == true then
 		getgenv().aimpart = "Head"
 	else
