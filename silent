@@ -161,7 +161,7 @@ if getgenv().dps_settings == nil then
 		["toggle_full_blatant"] = Enum.KeyCode.L,
 		["toggle_legit_mode"] = Enum.KeyCode.U,
 		["normal_hit_chance"] = 6,
-		["legit_hit_chance"] = 1.2,
+		["legit_hit_chance"] = 1.6,
 
 
 	}
@@ -923,6 +923,7 @@ while task.wait(0.05) do
 	if legit_mode == true then
 		rng = getgenv().dps_settings["legit_hit_chance"] * 10
 	end
+	print(rng)
 	if math.random(1, rng) <= 10 then
 		hitchance = false
 	else
