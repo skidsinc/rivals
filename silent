@@ -161,7 +161,7 @@ if getgenv().dps_settings == nil then
 		["toggle_full_blatant"] = Enum.KeyCode.L,
 		["toggle_legit_mode"] = Enum.KeyCode.U,
 		["normal_hit_chance"] = 6,
-		["legit_hit_chance"] = 12,
+		["legit_hit_chance"] = 15,
 
 
 	}
@@ -1057,6 +1057,7 @@ while task.wait(0.1) do
 		end
 	end
 end
+
 
 
 
