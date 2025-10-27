@@ -284,31 +284,9 @@ local LocalPlayer = Players.LocalPlayer
 local anim_id = "rbxassetid://90094153163920"
 local is_invis = false
 
-local CASa = game:GetService("ContextActionService")
-
-local function disableLeftControl()
-	if LocalPlayer.Name == "69Rivals67pro69" then
-		task.spawn(function()
-pcall(function()
-	CASa:BindAction("BlockLeftControl", function()
-		return Enum.ContextActionResult.Sink  -- consume input, block key
-	end, false, Enum.KeyCode.LeftControl)
-end)
-end)
-	end
-end
-
-local function enableLeftControl()
-task.spawn(function()
-pcall(function()
-	CASa:UnbindAction("BlockLeftControl")
-end)
-end)
-end
 
 
 local function go_invis()
-disableLeftControl()
 	is_invis = true
 	while is_invis == true do
 		task.wait(0.1)
@@ -341,7 +319,6 @@ disableLeftControl()
 end
 
 local function go_vis()
-enableLeftControl()
 	is_invis = false
 
 	local character = LocalPlayer.Character
@@ -358,7 +335,6 @@ enableLeftControl()
 	end
 end
 
-enableLeftControl()
 
 local function notify(head, desc, time, type)
 	local time_ = time or 10
