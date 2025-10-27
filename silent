@@ -344,8 +344,8 @@ local function addhighlight(part)
 		highlight.Adornee = part
 		highlight.FillColor = Color3.fromRGB(255, 0, 0)
 		highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
-		highlight.FillTransparency = 0.4
-		highlight.OutlineTransparency = 0.2
+		highlight.FillTransparency = 0.6
+		highlight.OutlineTransparency = 0.3
 		highlight.Name = "dpsthug"
 		highlight.Parent = part
 	end)
@@ -867,7 +867,7 @@ utility.Raycast = function(...)
 
 		local success, closest = pcall(get_closest_player)
 		if success and closest then
-			if holdingt == true or grens == true or math.random(1,5) == 1 then
+			if holdingt == true or grens == true or math.random(1,6) == 1 then
 				arguments[3] = arguments[3];
 			else
 				arguments[3] = closest[getgenv().aimpart].Position + Vector3.new(math.random(-random_strength, random_strength) / 100, math.random(-5, 5) / 10, math.random(-random_strength, random_strength) / 100);
