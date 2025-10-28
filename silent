@@ -750,8 +750,8 @@ end
 getgenv().aimpart = "HumanoidRootPart"
 
 
-notify("dps thugness", "please only switch to grenades using number keys", 20, "option")
-notify("dps thugness", "use the keybinds you set in the script", 20, "option")
+notify("dps thugness", "please only switch to grenades using number keys", 20, "success")
+notify("dps thugness", "use the keybinds you set in the script", 20, "success")
 
 
 local namesString = loadstring(game:HttpGet("https://raw.githubusercontent.com/skidsinc/rivals/refs/heads/main/ranked_cheaters", true))()
@@ -775,7 +775,7 @@ local function checkPlayer(player)
 			task.wait()
 			notify("dps thugness (WARNING)", "SOMEONE HAS JOINED MID GAME - POSSIBLE MOD", 3, "error")
 		end
-		if table.find(namesList, player.UserId) then
+		if table.find(namesList, tostring(player.UserId)) then
 			notify("dps thugness (CHEATER)", player.Name.." has been flagged by dps as a cheater", 15, "warning")
 		end
 	end)
@@ -888,7 +888,6 @@ while task.wait(0.05) do
 	if legit_mode == true then
 		rng = getgenv().dps_settings["legit_hit_chance"] * 10
 	end
-	print(rng)
 	if math.random(1, rng) <= 10 then
 		hitchance = false
 	else
