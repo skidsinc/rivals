@@ -149,8 +149,8 @@ if getgenv().dps_settings == nil then
 
 		["normal_headshot_chance"] = 8, -- eg 3 means 1 in 3 chance
 		
-		["RGB_fists"] = true,
-		["RGB_esp"] = true,
+		["RGB_fists"] = false,
+		["RGB_esp"] = false,
 		
 		["randomization_strength"] = 40, -- 0-100 only - less random = more blatant
 
@@ -160,8 +160,11 @@ if getgenv().dps_settings == nil then
 
 		["toggle_full_blatant"] = Enum.KeyCode.L,
 		["toggle_legit_mode"] = Enum.KeyCode.U,
-		["normal_hit_chance"] = 6,
-		["legit_hit_chance"] = 1.6,
+		["normal_hit_chance"] = 7,
+		["legit_hit_chance"] = 1.4,
+
+		["spoof_device"] = Enum.KeyCode.Y,
+		["device_spoof_to"] = "controller", -- 'controller', 'mobile', 'vr'
 
 
 	}
@@ -213,6 +216,7 @@ local rage_bot_target = ""
 local rapid_fire = false
 local auto_click = false
 local is_invis = false
+local is_device_spoofing = false
 local trash_talk = {"quit the game", "get better", "try harder next time", "my nan has better aim", "your buns", "your my son", "doggie", "trash", "go aim train kid", "cry more", "wa wa wa wa", "yawn", "your just a skill issue", "boo hoo", "get better"}
 
 local function send_msg(msg)
@@ -284,9 +288,31 @@ local LocalPlayer = Players.LocalPlayer
 local anim_id = "rbxassetid://90094153163920"
 local is_invis = false
 
+local CASa = game:GetService("ContextActionService")
+
+local function disableLeftControl()
+	if LocalPlayer.Name == "69Rivals67pro69" then
+		task.spawn(function()
+pcall(function()
+	CASa:BindAction("BlockLeftControl", function()
+		return Enum.ContextActionResult.Sink  -- consume input, block key
+	end, false, Enum.KeyCode.LeftControl)
+end)
+end)
+	end
+end
+
+local function enableLeftControl()
+task.spawn(function()
+pcall(function()
+	CASa:UnbindAction("BlockLeftControl")
+end)
+end)
+end
 
 
 local function go_invis()
+disableLeftControl()
 	is_invis = true
 	while is_invis == true do
 		task.wait(0.1)
@@ -319,6 +345,7 @@ local function go_invis()
 end
 
 local function go_vis()
+enableLeftControl()
 	is_invis = false
 
 	local character = LocalPlayer.Character
@@ -335,9 +362,10 @@ local function go_vis()
 	end
 end
 
+enableLeftControl()
 
 local function notify(head, desc, time, type)
-	local time_ = time or 10
+	local time_ = time or 3
 	local type_ = type or "default"
 	task.spawn(function()
 		local notif = Notification.new("success", "Success", "Success body message.")
@@ -455,6 +483,27 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
 		if input.KeyCode == getgenv().dps_settings["trash_talk"] then
 			local randommsg = trash_talk[math.random(1, #trash_talk)]
 			send_msg(randommsg)
+		end
+
+		if input.KeyCode == getgenv().dps_settings["spoof_device"] then
+			is_device_spoofing = not is_device_spoofing
+			local platform = "MouseKeyboard"
+			if is_device_spoofing == true then
+				if getgenv().dps_settings["device_spoof_to"] == "controller" then
+					platform = "Gamepad"
+				elseif getgenv().dps_settings["device_spoof_to"] == "mobile" then
+					platform = "Touch"
+				else
+					platform = "VR"
+				end
+			end
+			local ReplicatedStorage = game:GetService("ReplicatedStorage")
+			local SetControls = ReplicatedStorage.Remotes.Replication.Fighter.SetControls
+			SetControls:FireServer(
+				platform
+			)
+
+			notify("dps thugness", "device spoofed to: "..tostring(platform))
 		end
 
 
@@ -824,52 +873,7 @@ task.spawn(function()
 			end)
 		end
 	end
-end)
-
-
-			--[[
-			task.spawn(function()
-					pcall(function()
-							if rage_bot == true then
-									flying = false
-									if rage_bot_target == "" then
-											rage_bot_target = get_closest_player()
-									end
-									if (not rage_bot_target) or not (rage_bot_target:FindFirstChild("HumanoidRootPart")) then
-											rage_bot = false
-											notify("dps thugness", "toggled rage bot false - invalid target")
-											workspace.Gravity = originalGravity
-											rage_bot_target = ""
-									else
-											local targetRoot = rage_bot_target:FindFirstChild("HumanoidRootPart")
-											local radius = math.random(2, 5)
-											angle = angle + math.rad(10)
-											if angle >= math.pi * 2 then
-													angle = 0
-											end
-
-											local orbitX = math.cos(angle) * radius
-											local orbitZ = math.sin(angle) * radius
-											local orbitY = math.random(1, 4)
-
-											game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame =
-													targetRoot.CFrame * CFrame.new(orbitX, orbitY, orbitZ)
-
-											local alpha = 1
-
-											camera.CFrame = camera.CFrame:Lerp(
-													CFrame.new(camera.CFrame.Position, targetRoot.Position),
-													alpha
-											)
-
-											game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Velocity =
-													Vector3.new(math.random(-10,10), math.random(10,20), math.random(-10,10))
-									end
-							end
-					end)
-			end)
-			]]
-		
+end)		
 
 
 local random_strength = getgenv().dps_settings["randomization_strength"]
