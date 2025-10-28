@@ -152,7 +152,7 @@ if getgenv().dps_settings == nil then
 		["RGB_fists"] = false,
 		["RGB_esp"] = false,
 		
-		["randomization_strength"] = 40, -- 0-100 only - less random = more blatant
+		["randomization_strength"] = 25, -- 0-100 only - less random = more blatant
 
 		["toggle_fly"] = Enum.KeyCode.K,
 		["default_fly_speed"] = 100,
@@ -160,7 +160,7 @@ if getgenv().dps_settings == nil then
 
 		["toggle_full_blatant"] = Enum.KeyCode.L,
 		["toggle_legit_mode"] = Enum.KeyCode.U,
-		["normal_hit_chance"] = 7,
+		["normal_hit_chance"] = 10,
 		["legit_hit_chance"] = 1.4,
 
 		["spoof_device"] = Enum.KeyCode.Y,
@@ -762,11 +762,18 @@ for name in namesString:gmatch("[^\r\n]+") do
 		table.insert(namesList, name)
 end
 
+getgenv().thuggin = false
+task.spawn(function()
+	task.wait(3)
+	getgenv().thuggin = true
+end)
 
 local function checkPlayer(player)
 	pcall(function()
+		if getgenv().thuggin == true then
+			notify("dps thugness (WARNING)", "SOMEONE HAS JOINED MID GAME - POSSIBLE MOD", 15, "warning")
+		end
 		if table.find(namesList, player.Name) then
-			print(player.Name .. " found!")
 			notify("dps thugness (CHEATER)", player.Name.." has been flagged by dps as a cheater", 15, "warning")
 		end
 	end)
@@ -775,6 +782,7 @@ end
 for _, player in ipairs(Players:GetPlayers()) do
 		checkPlayer(player)
 end
+
 Players.PlayerAdded:Connect(checkPlayer)
 
 
