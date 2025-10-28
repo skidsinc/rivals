@@ -775,7 +775,7 @@ local function checkPlayer(player)
 			task.wait()
 			notify("dps thugness (WARNING)", "SOMEONE HAS JOINED MID GAME - POSSIBLE MOD", 3, "error")
 		end
-		if table.find(namesList, player.Name) then
+		if table.find(namesList, player.UserId) then
 			notify("dps thugness (CHEATER)", player.Name.." has been flagged by dps as a cheater", 15, "warning")
 		end
 	end)
