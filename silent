@@ -341,9 +341,9 @@ end
 
 local function notify(head, desc, time, type)
 	local time_ = time or 3
-	local type_ = type or "default"
+	local type_ = type or "success"
 	task.spawn(function()
-		local notif = Notification.new("success", "Success", "Success body message.")
+		local notif = Notification.new(type_, "Success", "Success body message.")
 		notif:changeHeading(head) -- Args(<string> NewHeading)
 		notif:changeBody(desc) -- Args(<string> NewBody)
 		notif:deleteTimeout(time_) -- Args(<number> DeleteWaitTime)
