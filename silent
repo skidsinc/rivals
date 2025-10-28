@@ -767,7 +767,7 @@ local function checkPlayer(player)
 	pcall(function()
 		if table.find(namesList, player.Name) then
 			print(player.Name .. " found!")
-			notify("dps thugness (CHEATER)", player.Name.." has been flagged by dps as a cheater", 10, "warning")
+			notify("dps thugness (CHEATER)", player.Name.." has been flagged by dps as a cheater", 15, "warning")
 		end
 	end)
 end
