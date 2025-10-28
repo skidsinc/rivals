@@ -772,6 +772,8 @@ local function checkPlayer(player)
 	pcall(function()
 		if getgenv().thuggin == true then
 			notify("dps thugness (WARNING)", "SOMEONE HAS JOINED MID GAME - POSSIBLE MOD", 15, "warning")
+			task.wait()
+			notify("dps thugness (WARNING)", "SOMEONE HAS JOINED MID GAME - POSSIBLE MOD", 3, "error")
 		end
 		if table.find(namesList, player.Name) then
 			notify("dps thugness (CHEATER)", player.Name.." has been flagged by dps as a cheater", 15, "warning")
@@ -904,7 +906,6 @@ while task.wait(0.05) do
 		end
 	end
 end
-
 
 
 
