@@ -300,7 +300,6 @@ local function go_invis()
 			local humanoid = character:FindFirstChildOfClass("Humanoid")
 			if not humanoid then return end
 
-			-- check if animation is already playing
 			local alreadyPlaying = false
 			for _, track in ipairs(humanoid:GetPlayingAnimationTracks()) do
 				if track.Animation and track.Animation.AnimationId == anim_id then
@@ -768,7 +767,7 @@ local function checkPlayer(player)
 	pcall(function()
 		if table.find(namesList, player.Name) then
 			print(player.Name .. " found!")
-			notify("dps thugness (CHEATER)", player.Name.." has been flagged by dps as a cheater", 5)
+			notify("dps thugness (CHEATER)", player.Name.." has been flagged by dps as a cheater", 10, "warning")
 		end
 	end)
 end
