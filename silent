@@ -143,6 +143,8 @@ if getgenv().dps_settings == nil then
 		["toggle_rapid_fire"] = Enum.KeyCode.I,
 		["toggle_autoclick"] = Enum.KeyCode.B,
 
+		["toggle_cam_lock"] = Enum.KeyCode.Q, -- for sniper
+
 
 		["go_invisible"] = Enum.KeyCode.X,
 		["go_visible"] = Enum.KeyCode.Z,
@@ -152,7 +154,7 @@ if getgenv().dps_settings == nil then
 		["RGB_fists"] = false,
 		["RGB_esp"] = false,
 		
-		["randomization_strength"] = 25, -- 0-100 only - less random = more blatant
+		["randomization_strength"] = 40, -- 0-100 only - less random = more blatant
 
 		["toggle_fly"] = Enum.KeyCode.K,
 		["default_fly_speed"] = 100,
@@ -160,11 +162,13 @@ if getgenv().dps_settings == nil then
 
 		["toggle_full_blatant"] = Enum.KeyCode.L,
 		["toggle_legit_mode"] = Enum.KeyCode.U,
-		["normal_hit_chance"] = 10,
+		["normal_hit_chance"] = 8,
 		["legit_hit_chance"] = 1.4,
 
 		["spoof_device"] = Enum.KeyCode.Y,
 		["device_spoof_to"] = "controller", -- 'controller', 'mobile', 'vr'
+
+
 
 
 	}
@@ -199,6 +203,13 @@ local players = game.GetService(game, "Players")
 local camera = workspace.CurrentCamera
 local utility = require(replicated_storage.Modules.Utility);
 
+local players = game:GetService("Players");
+local run_service = game:GetService("RunService");
+local replicated_storage = game:GetService("ReplicatedStorage");
+local user_input_service = game:GetService("UserInputService")
+local camera = workspace.CurrentCamera;
+local localplayer = players.LocalPlayer;
+local playerscripts = localplayer.PlayerScripts;
 
 
 local UserInputService = game:GetService("UserInputService")
@@ -206,6 +217,7 @@ local holdingt = false
 local holding_shift = false
 local holdingm1 = false
 local grens = false
+local cam_lock = false
 local esp_toggle = true
 local headshot_only = false
 local togglwoggle = false -- silent
@@ -370,9 +382,10 @@ end
 
 
 notify("dps thugness", "attempting to load...", 5)
+wait(1)
 
 task.spawn(function()
-	task.wait(5)
+	task.wait(8)
 	if getgenv().dps_loaded == false then
 		notify("dps thugness", "taking longer to load then normal", 5)
 	end
@@ -401,7 +414,7 @@ local function scanTable(t, visited, modify)
 										originalValues[t][k] = v -- store original only once
 								end
 								print("Found:", k, "->", tostring(v), " (setting to 0)")
-								t[k] = 0.055
+								t[k] = 0.06
 						end
 				end
 				if type(v) == "table" then
@@ -455,6 +468,11 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
 			notify("dps thugness", "toggled esp: "..tostring(esp_toggle))
 		end
 
+		if input.KeyCode == getgenv().dps_settings["toggle_cam_lock"] then
+			cam_lock = not cam_lock
+			notify("dps thugness", "toggled cam lock: "..tostring(cam_lock))
+		end
+
 		if input.KeyCode == getgenv().dps_settings["trash_talk"] then
 			local randommsg = trash_talk[math.random(1, #trash_talk)]
 			send_msg(randommsg)
@@ -482,10 +500,25 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
 		end
 
 
+		if input.KeyCode == Enum.KeyCode.Backspace then
+			local players = game:GetService("Players")
+			local allPlayers = ""
+
+			for _, player in ipairs(players:GetPlayers()) do
+				if player ~= players.LocalPlayer then
+					allPlayers = allPlayers.." ||| "..player.Name.." "..player.UserId
+				end
+			end
+
+			setclipboard(allPlayers)
+			notify("dps thugness", "copying all userids")
+		end
+
 		if input.KeyCode == getgenv().dps_settings["toggle_autoclick"] then
 			auto_click = not auto_click
 			notify("dps thugness", "toggled autoclicker: "..tostring(auto_click))
 		end
+
 		if input.KeyCode == getgenv().dps_settings["toggle_headshot_only"] then
 			headshot_only = not headshot_only
 			notify("dps thugness", "toggled headshot only: "..tostring(headshot_only))
@@ -759,7 +792,7 @@ local namesString = loadstring(game:HttpGet("https://raw.githubusercontent.com/s
 
 local namesList = {}
 for name in namesString:gmatch("[^\r\n]+") do
-		table.insert(namesList, name)
+	table.insert(namesList, name)
 end
 
 getgenv().thuggin = false
@@ -881,6 +914,62 @@ utility.Raycast = function(...)
 	end
 	return old(table.unpack(arguments));
 end
+
+local get_weapon = function(fighter)
+    return fighter.EquippedItem;
+end
+
+local get_fighter = function(player)
+	local fighter_controller = require(playerscripts.Controllers.FighterController);
+    return fighter_controller:GetFighter(player);
+end
+
+local calculate_prediction = function(origin_pos, end_pos, end_velocity, bullet_speed)
+    local distance = (origin_pos - end_pos).Magnitude;
+    local travel_time = distance / bullet_speed;
+
+    return (end_velocity * travel_time)/2.8;
+        
+end
+
+local render_stepped; render_stepped = run_service.RenderStepped:Connect(function()
+	local success, closest = pcall(get_closest_player)
+	if success and closest and cam_lock then
+		pcall(function()
+			local weapon = get_weapon(get_fighter(players.LocalPlayer));
+			if user_input_service:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) and (weapon and weapon.Info.ProjectileSpeed) then
+				local camera_controller = require(playerscripts.Controllers.CameraController);
+				local end_pos = closest["Head"].Position
+
+				local predicted_velocity = calculate_prediction(weapon.ViewModel._body_model.BodyPrimary.Position, end_pos, closest.HumanoidRootPart.Velocity, weapon.Info.ProjectileSpeed);
+				local predicted_pos = end_pos + Vector3.new(predicted_velocity.X, 0, predicted_velocity.Z);
+				camera_controller:MimicRotation(CFrame.new(camera.CFrame.Position, predicted_pos));
+			end
+		end)
+	end
+
+end)
+
+
+--[[
+lowk breaks game if u exec on spawn (maybe fixed)
+task.spawn(function()
+	local old_upd_rotation; old_upd_rotation = hookfunction(mechanics_controller._UpdateCharacterRotation, function(self)
+		pcall(function()
+			if self.LocalFighter and self.LocalFighter.Entity and full_blatant then
+				local rootpart = self.LocalFighter.Entity.RootPart;
+				local head = self.LocalFighter.Entity.Head;
+				if rootpart then
+					aa_rotation += 6; 
+					rootpart.CFrame = CFrame.new(rootpart.Position) * CFrame.Angles(90, aa_rotation, 90);
+				end
+			end
+		end)
+	end)
+end)
+
+
+]]
 
 
 while task.wait(0.05) do
