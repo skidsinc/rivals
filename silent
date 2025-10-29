@@ -984,13 +984,13 @@ while task.wait(0.05) do
 	end
 
 	if math.random(1, getgenv().dps_settings["normal_headshot_chance"]) == 1 or headshot_only == true or full_blatant == true then
-		getgenv().aimpart = "Head"
+		getgenv().aimpart = "HitboxHead"
 	else
 		local tug = math.random(1,2)
 		if tug == 1 then
-			getgenv().aimpart = "HumanoidRootPart"
+			getgenv().aimpart = "HitboxBody"
 		elseif tug == 2 then
-			getgenv().aimpart = "UpperTorso"
+			--getgenv().aimpart = "UpperTorso"
 		end
 	end
 end
